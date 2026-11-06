@@ -1,8 +1,8 @@
 # Proceso de Aprendizaje 3 | Automatización y Transacciones
 
-## Nombre del proyecto
+## Proyecto
   
-  * **PA3 - Actividad 1:** Automatización y Transacciones
+  * **PA3 - Automatización y Transacciones
   * **Curso:** Programación Avanzada de Base de Datos (30627)
   * **Caso:** 
   * **Motor:** SQL Server | Autenticación de Windows | instancia local
@@ -14,3 +14,16 @@
    * NADIA MABEL VINCES ASCA -  70474181@mail.isil.pe
    * LUIGI ALVA SANCHEZ -   48584750@mail.isil.pe
 
+
+## Descripción: 
+
+## Objetivo:
+
+## Desarrollo:
+
+## Evidencias:
+
+## Conclusiones:
+
+## Video de Exposición:
+Video público de YouTube
