@@ -1,9 +1,9 @@
-# Proceso de Aprendizaje 3 | Automatización y Transacciones
+# Proceso de Aprendizaje 3 | NovaMarket - Automatización y Transacciones
 
-## Proyecto
   
   * **PA3** - Automatización y Transacciones
   * **Curso:** Programación Avanzada de Base de Datos (30627)
+  * **Motor:** SQL Server | Autenticación de Windows | Instancia local
    
 ## Integrantes:
 
@@ -23,36 +23,63 @@ Automatizar las operaciones del lado del servidor mediante procedimientos almace
 ## Desarrollo:
 Dividimos el desarrollo en los siguientes puntos:  
 
-* **Actividad 1 (Proceso a automatizar):** Identificamos el proceso de "Registro de un pedido" (cabecera, detalle y descuento de stock). Definimos las variables de entrada/salida y la regla de "todo o nada". Justificamos el uso de una arquitectura en dos capas para centralizar las reglas en el servidor.
+* **Actividad 1 (Identificación del proceso a automatizar):**
+Analizamos el proceso de **Registro de un Pedido**, el cual involucra tres operaciones dependientes (crear cabecera, insertar líneas de detalle y descontar stock). Definimos entradas, salidas, reglas de negocio estrictas y demostramos por qué el método tradicional de enviar sentencias sueltas deja la base de datos inconsistente si ocurre un fallo a mitad de camino.
 
-* **Actividad 2 (Mantenimientos):** Programamos procedimientos almacenados (usp_Registrar_Cliente_Nuevo, usp_Actualizar_Datos_Clientes, usp_Eliminar_Cliente_ID) con parámetros de entrada, parámetros OUTPUT para IDs generados, y valores RETURN para manejar los distintos escenarios (éxito, error, duplicados).
+* **Actividad 2 (Mantenimientos):**
+Programamos objetos reutilizables en el servidor para el mantenimiento de clientes (usp_Registrar_Cliente_Nuevo, usp_Actualizar_Datos_Clientes, usp_Eliminar_Cliente_ID) utilizando parámetros parametrizados, control de duplicados y validación de restricciones de integridad referencial.
 
-* **Actividad 3 (Transacciones):** Desarrollamos el procedimiento usp_RegistrarPedido usando BEGIN TRANSACTION, COMMIT y ROLLBACK. Validamos que el stock no sea negativo, de modo que si un producto se agota durante la venta, toda la operación se cancela automáticamente.
-* **Actividad 4 (Pruebas):** Ejecutamos los escenarios preparados en la base de datos base, comparando el estado de las tablas antes y después para un pedido confirmado y un pedido cancelado por falta de inventario.  
+* **Actividad 3 (Transacciones):**
+ Implementamos el procedimiento almacenado central usp_RegistrarPedido integrando una **transacción explícita** (BEGIN TRANSACTION, COMMIT, ROLLBACK) y la directiva de seguridad XACT_ABORT ON. Esto garantiza que si el stock es insuficiente o ocurre un error, toda la operación se revierte automáticamente.
+
+* **Actividad 4 (Pruebas):** Ejecutamos una batería rigurosa de 7 escenarios de prueba (tanto de confirmación exitosa como de cancelación por reglas de negocio o stock) contrastando el estado de las tablas antes y después de cada ejecución y validando el comportamiento con una matriz automatizada.
 
 
 ## Solución propuesta:
-* Entregamos una solución estructurada que elimina la dependencia de autoconfirmación de SQL Server. 
-* Con la transacción explícita en usp_RegistrarPedido, garantizamos la atomicidad de las ventas: ahora, si falla el descuento de stock de un solo producto, el bloque entero se revierte (ROLLBACK), protegiendo la consistencia de los datos.
-* Centralizamos la validación de precios directamente desde Producto.PrecioListA en el servidor, impidiendo que la capa cliente pueda enviar precios alterados.  
-
+* Entregamos scripts ejecutables modulares que abarcan desde la creación de esquemas y datos base hasta la automatización server-side mediante objetos robustos (usp_RegistrarPedido y procedimientos de mantenimiento).
+  
+* Incorporamos contratos de retorno estructurados (RETURN 0 para éxito, 1 para cliente inválido, 2 para producto inválido, 3 por falta de stock y 4 por datos incompletos) que estandarizan la comunicación con cualquier aplicación cliente.
+  
+* Validamos técnicamente que las transacciones explícitas evitan registros parciales y garantizan la consistencia del inventario ante concurrencia y fallas lógicas.
 
 ## Indicaciones para ejecutar / revisar el proyecto:
 Abrir SQL Server Management Studio (SSMS) y conectarse a la instancia local con Autenticación de Windows. Ejecutar los scripts en el siguiente orden:
 
-*1 | 00 esquema y datos base.sql | Crea la BD PA3_NovaMarket, las 5 tablas y carga los datos de prueba. |
-*2 | actividad1 proceso.sql | Documenta entradas/salidas y demuestra el problema de la autoconfirmación. |
-*3 | actividad2_procedimientos.sql | Crea y ejecuta los SPs de mantenimiento de clientes. |
-*4 | actividad3_transaccion.sql | Crea el procedimiento transaccional usp_RegistrarPedido. |
-*5 | actividad4_pruebas.sql | Ejecuta la matriz de pruebas y muestra las capturas de estado. |
-
+*1. Conéctate a tu instancia local de SQL Server usando **Autenticación de Windows**.
+*2. Ejecuta el script base del proyecto (`00_esquema_y_datos_base.sql) para crear la base de datos PA3_NovaMarket y cargar el estado inicial de tablas.
+*3. Abre y ejecuta el script de la **Actividad 1** (actividad1_proceso.sql) para revisar el análisis del proceso y la demostración del problema con sentencias sueltas.
+*4. Abre y ejecuta el script de la **Actividad 2** (actividad2_procedimientos.sql) para compilar los procedimientos de mantenimiento de clientes y sus casos de prueba.
+*5. Abre y ejecuta el script de la **Actividad 3** (actividad3_transaccion.sql) para crear el procedimiento transaccional usp_RegistrarPedido.
+*6. Abre y ejecuta el script de la **Actividad 4** (actividad4_pruebas.sql) completo (con F5) para correr los 7 escenarios de validación y desplegar la matriz de resultados comparativa.
 
 
 ## Evidencias:
+###Actividad 1:
+* **Arquitectura Cliente/Servidor y Flujo del Proceso:**
+<img width="1038" height="1268" alt="image" src="https://github.com/user-attachments/assets/87e6eaf9-12a5-465d-9066-12a800769e59" />
+
+* **Diagrama Entidad-Relación:**
+<img width="848" height="1233" alt="image" src="https://github.com/user-attachments/assets/4870f3c2-3f1c-4431-b247-28b1dc39eb47" />
+
+###Actividad 2:
+* **Ejecución de Procedimientos de Mantenimiento:**
+<img width="873" height="1210" alt="image" src="https://github.com/user-attachments/assets/33e7cdfb-7420-4fee-a0da-e357109d24e0" />
+<img width="892" height="1269" alt="image" src="https://github.com/user-attachments/assets/b20fd473-b3df-4e79-baf6-6dbcaab11369" />
+
+###Actividad 3:
+* **Demostración de Transacción y ROLLBACK:**
+<img width="874" height="1280" alt="image" src="https://github.com/user-attachments/assets/b49df30e-3bba-4285-9c4f-1c2a60113a74" />
+<img width="873" height="466" alt="image" src="https://github.com/user-attachments/assets/380db605-99dd-433f-8e98-9b2a5417200d" />
+
+###Actividad 4:
+* **Matriz de Pruebas Automatizada:**
+<img width="873" height="1262" alt="image" src="https://github.com/user-attachments/assets/1e76b294-828f-4e2d-b9b8-30ff0f90bd86" />
 
 
 ## Conclusiones:
-
+* Trasladar la lógica operativa al servidor mediante **procedimientos almacenados** centraliza las reglas de negocio, permitiendo que cualquier aplicación cliente se comunique de forma estandarizada y segura.
+* El uso de **transacciones explícitas** (BEGIN TRANSACTION y ROLLBACK) es indispensable para garantizar el principio de "todo o nada", previniendo que fallos por stock insuficiente dejen registros de pedidos huérfanos o inventarios alterados parcialmente.
+* La implementación de contratos mediante valores de retorno (RETURN) facilita el manejo de excepciones lógicas en la capa cliente, mejorando la robustez general del sistema backend.
 
 
 ## Video de Exposición:
