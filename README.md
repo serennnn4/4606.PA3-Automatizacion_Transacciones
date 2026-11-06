@@ -2,7 +2,7 @@
 
 ## Proyecto
   
-  * **PA3 - Automatización y Transacciones
+  * **PA3** - Automatización y Transacciones
   * **Curso:** Programación Avanzada de Base de Datos (30627)
   * **Caso:** 
   * **Motor:** SQL Server | Autenticación de Windows | instancia local
