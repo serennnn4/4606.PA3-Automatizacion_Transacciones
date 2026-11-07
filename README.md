@@ -91,4 +91,4 @@ Abre **SQL Server Management Studio (SSMS)**, conéctate usando *Autenticación 
 ---
 
 ## Video de Exposición:
-Video público de YouTube:
+Video público de YouTube: https://youtu.be/632iR2fMAb0
